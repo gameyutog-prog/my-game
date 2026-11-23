@@ -3390,7 +3390,7 @@ body.ud-mode .menu-btn,body.ud-mode .btn{border-width:2px}
 (function(){
   var home=document.getElementById('startOverlay');if(!home)return;
   /* ヘッダーにバージョン表示 */
-  var hs=home.querySelector('.home-brand-head small');if(hs)hs.textContent='テトリス～時空の支配者～　v3.2.5';
+  var hs=home.querySelector('.home-brand-head small');if(hs)hs.textContent='テトリス～時空の支配者～　v4.0.0';
 
   /* セクションの見出しを「やること」中心の言葉に */
   var info=[
@@ -4324,7 +4324,7 @@ body.home-new #startOverlay .home-content-shell,body.home-new #homeSettingsBtn{d
 
   /* ============ 新ホーム(Nova) ============ */
   var home=document.getElementById('startOverlay'),N=document.createElement('div');N.id='homeNova';
-  N.innerHTML='<div class="nv-top"><div class="nv-title">TETRIS<small>時空の支配者 ・ v3.2.5</small></div><div style="display:flex;gap:8px"><div class="nv-chip nv-admin" data-fn="openAdminConsole" style="display:none;border-color:#f0abfc;color:#f0abfc">🛠 管理者</div><div class="nv-chip" data-fn="openSettings">⚙ 設定</div></div></div>'
+  N.innerHTML='<div class="nv-top"><div class="nv-title">TETRIS<small>時空の支配者 ・ v4.0.0</small></div><div style="display:flex;gap:8px"><div class="nv-chip nv-admin" data-fn="openAdminConsole" style="display:none;border-color:#f0abfc;color:#f0abfc">🛠 管理者</div><div class="nv-chip" data-fn="openSettings">⚙ 設定</div></div></div>'
    +'<div class="nv-rank" data-fn="openStatusProfile"><div class="nv-ring"><div class="nv-badge">E−</div></div><div class="nv-rinfo"><div class="nv-rt">CURRENT RANK</div><div class="nv-pw"></div><div class="nv-nx"></div><div class="nv-bar"><i></i></div><div class="nv-meta"></div></div><div class="nv-go">STELRANK を開く ›</div></div>'
    +'<div class="nv-hero" data-fn="openWorldSelect"><span class="hi">⚔</span>出撃<small></small></div>'
    +'<div class="nv-sec">PREPARE ／ 準備</div><div class="nv-grid nv-g4" id="nvPrep"></div>'
@@ -4390,14 +4390,8 @@ body.home-new #startOverlay .home-content-shell,body.home-new #homeSettingsBtn{d
     document.querySelectorAll('.overlay').forEach(function(e){e.classList.add('hidden');});pick.classList.remove('hidden');}
   var _tv=triggerVictory;triggerVictory=function(){var wasExp=(gameMode==='expedition'&&gameState==='PLAYING'&&!gameOver),r=_tv.apply(this,arguments);if(wasExp)setTimeout(showPick,600);return r;};
 
-  /* ---- BUG-009: リバイブフェザー — 持っているだけで、負けたときに1回自動発動 ---- */
-  var _td=triggerDefeat;triggerDefeat=function(){
-    try{if(!trainingMode&&gameState==='PLAYING'&&(itemInventory.revive||0)>0){
-      itemInventory.revive--;var topOut=playerHp>0;playerHp=Math.max(1,Math.floor(calcMaxHp*.3));
-      var removed=0;board=board.filter(function(r){if(removed<8&&r.some(function(v){return v!==0;})){removed++;return false;}return true;});while(board.length<ROWS)board.unshift(new Array(COLS).fill(0));
-      gameOver=false;gameState='PLAYING';isRewinding=false;enemyTimer=0;dropCounter=0;softDropTimer=0;lockTimer=0;isGrounded=false;showPopup('🪽 リバイブフェザー発動！ HP '+Math.floor(playerHp),'#fbbf24',2.2);try{playSound('heal');updateTouchSkillItemButtons();}catch(e){}
-      if(topOut){try{spawnPiece();}catch(e){}}saveData();return;}}catch(e){}
-    return _td.apply(this,arguments);};
+  /* ---- v3.1.0: リバイブフェザー自動発動を完全無効化 ---- */
+  var _td=triggerDefeat;triggerDefeat=function(){return _td.apply(this,arguments);};
 
   /* ---- BUG-010: 時間制限モードのTIME UP — 到達WAVEに応じた報酬を付与 ---- */
   var _fta=finishTimeAttack;finishTimeAttack=function(){var was=timeAttackShown,r=_fta.apply(this,arguments);
@@ -4465,9 +4459,9 @@ body.home-new #startOverlay .home-content-shell,body.home-new #homeSettingsBtn{d
     cards.forEach(function(c){if(!c.parentNode)so.insertBefore(c,so.querySelector('.danger-zone')||so.lastElementChild);});
     var dz=so.querySelector('.danger-zone');if(dz){var safe=cards[3];safe.appendChild(dz);}
   }
-  var notices=[['🧪 v3.2.5','設定画面の表示とホーム画面の入場演出を改善しました。'],['💾 セーブ引き継ぎ','レベル、操作設定、ホームデザインなどをバックアップから引き継げます。'],['📢 お知らせ','今後も遊びやすさ、演出、保存機能を中心に改善していきます。']];
+  var notices=[['🧪 v4.0.0','設定画面の表示とホーム画面の入場演出を改善しました。'],['💾 セーブ引き継ぎ','レベル、操作設定、ホームデザインなどをバックアップから引き継げます。'],['📢 お知らせ','今後も遊びやすさ、演出、保存機能を中心に改善していきます。']];
   window.openNotices=function(){var o=document.getElementById('noticeOverlay');if(!o){o=document.createElement('div');o.id='noticeOverlay';o.className='overlay';o.style.zIndex=65;document.getElementById('gameContainer').appendChild(o);}o.innerHTML='<div style="width:min(500px,92vw);padding:18px 14px"><div class="title-text" style="font-size:22px;color:#fde68a">📢 お知らせ</div>'+notices.map(function(n){return '<div class="v306-settings-card"><b style="color:#fde68a">'+n[0]+'</b><p class="v306-settings-desc" style="font-size:11px;color:#e2e8f0">'+n[1]+'</p></div>';}).join('')+'<button class="menu-btn" style="width:190px;margin:10px auto;display:block" onclick="openHome()">ホームへ戻る</button></div>';document.querySelectorAll('.overlay').forEach(function(x){x.classList.add('hidden');});o.classList.remove('hidden');};
-  var home=document.getElementById('startOverlay');if(home&&!document.getElementById('homeNotice')){var n=document.createElement('div');n.id='homeNotice';n.innerHTML='<b>📢 お知らせ　v3.2.5</b><small>設定・ホーム演出・セーブ引き継ぎを更新しました。タップして詳細を見る</small>';n.onclick=openNotices;var anchor=home.querySelector('.home-brand-head')||home.firstElementChild;if(anchor)anchor.insertAdjacentElement('afterend',n);}
+  var home=document.getElementById('startOverlay');if(home&&!document.getElementById('homeNotice')){var n=document.createElement('div');n.id='homeNotice';n.innerHTML='<b>📢 お知らせ　v4.0.0</b><small>設定・ホーム演出・セーブ引き継ぎを更新しました。タップして詳細を見る</small>';n.onclick=openNotices;var anchor=home.querySelector('.home-brand-head')||home.firstElementChild;if(anchor)anchor.insertAdjacentElement('afterend',n);}
 })();
 </script>
 <script>
@@ -5571,6 +5565,19 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
   var lockDepth = 0, testMatch = false, userPaused = false, menuPaused = false;
   var wasUserPaused = false, padPauseDown = false, replayIndex = -1;
   var arenaAudio = null, arenaVolumeBefore = null, preRewindFrame = null, audioWaiting = false;
+  var ARENA_PLAYER_MAX_HP = 1200, ARENA_PLAYER_ATK = 100, ARENA_PLAYER_HEAL = 80;
+  function applyArenaPlayerStats(keepHp) {
+    if (!api.enabled) return;
+    var oldHp = Number(playerHp) || ARENA_PLAYER_MAX_HP;
+    calcMaxHp = ARENA_PLAYER_MAX_HP; calcAtk = ARENA_PLAYER_ATK; calcHeal = ARENA_PLAYER_HEAL;
+    playerHp = keepHp ? Math.max(0, Math.min(calcMaxHp, oldHp)) : calcMaxHp;
+  }
+  function arenaMastery(cp) {
+    var lines = Math.max(0, Number(cp && cp.lines) || 0), tspin = Math.max(0, Number(cp && cp.tspin) || 0);
+    var score = lines + tspin * 4 + Math.max(0, Number(cp && cp.tetris) || 0) * 2;
+    var rank = score >= 30 ? 'S' : score >= 18 ? 'A' : score >= 9 ? 'B' : 'C';
+    return {score:score, rank:rank, next:rank==='S' ? 'MASTER' : (rank==='A' ? 'Sまで '+(30-score) : rank==='B' ? 'Aまで '+(18-score) : 'Bまで '+(9-score))};
+  }
   var api = window.__chronoArena = {
     enabled: false, phase: 'idle', pausedForRewind: false, elapsed: 0,
     frames: [], events: [], attacks: {player:0, cpu:0}, releasedAttacks: {player:0, cpu:0}, pendingPlayer: 0,
@@ -5899,7 +5906,7 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     if (arenaVolumeBefore === null) arenaVolumeBefore = Number.isFinite(media.volume) ? media.volume : 1;
     // The arena track is intentionally mixed a little louder, while the
     // player's normal music setting remains the ceiling and is restored on exit.
-    media.volume = Math.min(1, Math.max(0, arenaVolumeBefore * 1.5));
+    media.volume = Math.min(1, Math.max(0, arenaVolumeBefore * 1.8));
     if (media.__chronoGuarded) return;
     var play = media.play;
     media.__chronoGuarded = true;
@@ -5947,9 +5954,11 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     if (!hud) return;
     var title = hud.querySelector('.chrono-label'), clock = hud.querySelector('.chrono-time');
     var detail = hud.querySelector('.chrono-detail'), bar = hud.querySelector('.chrono-progress i');
+    var masteryEl = hud.querySelector('.chrono-mastery'), mastery = arenaMastery(window.__cpu || {});
     var names = {monochrome:'静止した序章',memory:'過去をたどる',build:'臨界点へ',rewind:'時間逆行',overdrive:'時空再始動'};
     title.textContent = names[api.phase] || 'CHRONO ARENA';
     clock.textContent = api.elapsed.toFixed(1)+'s';
+    if (masteryEl) masteryEl.textContent = 'MASTER RANK '+mastery.rank+'  //  熟練度 '+mastery.score+'  //  '+mastery.next;
     detail.textContent = audioWaiting ? 'BGM再生待ち  //  画面をタップして再開' :
       (api.pausedForRewind ? 'REWIND  //  戦闘停止・操作ロック' :
       (api.phase === 'overdrive' ? 'OVERDRIVE  //  お邪魔待ち '+api.pendingPlayer :
@@ -5991,6 +6000,7 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     }
     updateClock(now, paused);
     applyPrologueCpuStatus();
+    applyArenaPlayerStats(true);
     if (paused) { renderHud(); return; }
     // Until the chorus begins the CPU has no HP concept. Damage may still
     // animate for atmosphere, but its HP is restored before the real battle
@@ -6011,7 +6021,8 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     if (hud) hud.remove();
     hud = document.createElement('div'); hud.id = 'chronoArenaHud';
     hud.setAttribute('aria-live','off'); hud.setAttribute('role','status');
-    hud.innerHTML = '<div class="chrono-kicker">CHRONO ARENA <span> // STRONG</span></div><div class="chrono-head"><strong class="chrono-label"></strong><span class="chrono-time"></span></div><div class="chrono-detail"></div><div class="chrono-progress"><i></i></div>';
+    hud.innerHTML = '<div class="chrono-kicker">CHRONO ARENA <span> // STRONG</span></div><div class="chrono-head"><strong class="chrono-label"></strong><span class="chrono-time"></span></div><div class="chrono-detail"></div><div class="chrono-progress"><i></i></div><div class="chrono-mastery">MASTER RANK C  //  熟練度 0  //  Bまで 9</div>';
+    var style = document.createElement('style'); style.textContent = '#chronoArenaHud{border:1px solid rgba(125,211,252,.5);background:linear-gradient(135deg,rgba(8,15,38,.94),rgba(31,18,65,.88));box-shadow:0 0 28px rgba(34,211,238,.22),inset 0 0 22px rgba(129,92,246,.12)}#chronoArenaHud .chrono-mastery{margin-top:5px;color:#fde68a;font:900 9px/1.3 Orbitron,"Noto Sans JP",sans-serif;letter-spacing:.4px;text-shadow:0 0 8px rgba(253,230,138,.35)}'; document.head.appendChild(style);
     document.body.appendChild(hud);
   }
   function start() {
@@ -6028,7 +6039,7 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     previousNow = performance.now(); lastSample = -1; lastMedia = NaN; lastMediaProgress = previousNow;
     if (typeof enemyHp !== 'undefined' && typeof enemyMaxHp !== 'undefined') enemyHp = enemyMaxHp;
     document.body.classList.add('chrono-arena-active','chrono-arena-mono');
-    makeHud(); applySpeed(); renderCpu(); applyPrologueCpuStatus();
+    makeHud(); applyArenaPlayerStats(false); applySpeed(); renderCpu(); applyPrologueCpuStatus();
     setTimeout(function(){ if (api.enabled && api.elapsed < REWIND_TO) applyPrologueCpuStatus(); }, 80);
     addFrame(true);
     if (typeof oldBgm === 'function') {
@@ -6242,7 +6253,6 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     }
   },200);
 })();
-
 </script>
 
 <script id="public-arena-unlock">
@@ -6263,6 +6273,169 @@ EMBEDDED_AUDIO.bgm.strongArena = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAA
     buffer=(buffer+e.key.toLowerCase()).slice(-CODE.length);
     if(buffer===CODE){buffer='';reveal();}
   },true);
+})();
+</script>
+<script>
+/* v3.1.0 EXTRA PROGRESSION: achievements, daily bounty, and reward loop. */
+(function () {
+  'use strict';
+  if (window.__v310Progression) return;
+  window.__v310Progression = true;
+  var EXTRA = [
+    {id:'wins_250', name:'時空の覇者', desc:'バトルで250回勝利する', done:false, claimed:false, reward:8000},
+    {id:'lines_5000', name:'五千連結', desc:'通算5000ラインを消す', done:false, claimed:false, reward:7000},
+    {id:'tspin_30', name:'Tスピン錬成師', desc:'Tスピンを30回決める', done:false, claimed:false, reward:5000},
+    {id:'perfect_10', name:'完全消去の極意', desc:'パーフェクトクリアを10回達成する', done:false, claimed:false, reward:6000},
+    {id:'login_30', name:'月航海士', desc:'ログインボーナスを30日受け取る', done:false, claimed:false, reward:7000},
+    {id:'shop_10', name:'交換商人', desc:'交換ショップを10回利用する', done:false, claimed:false, reward:4000},
+    {id:'gacha_100', name:'時空召喚士', desc:'ガチャを100回引く', done:false, claimed:false, reward:6000}
+  ];
+  EXTRA.forEach(function (x) {
+    if (typeof ACHIEVEMENTS !== 'undefined' && !ACHIEVEMENTS.some(function (a) { return a.id === x.id; })) ACHIEVEMENTS.push(x);
+  });
+  function stateKey() { return 'tetrisV310DailyBounty'; }
+  function today() { return (typeof todayKey === 'function') ? todayKey() : new Date().toISOString().slice(0,10); }
+  function getState() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(stateKey()) || 'null'); } catch (e) {}
+    if (!s || s.date !== today()) {
+      s = {date:today(), lines:Number(missionProgress.lines)||0, tspins:Number(missionProgress.tSpins)||0, wins:Number(missionProgress.wins)||0, claimed:false};
+      try { localStorage.setItem(stateKey(), JSON.stringify(s)); } catch (e) {}
+    }
+    return s;
+  }
+  function saveState(s) { try { localStorage.setItem(stateKey(), JSON.stringify(s)); } catch (e) {} }
+  function bounty() {
+    var s = getState();
+    return {state:s, lines:Math.max(0,(Number(missionProgress.lines)||0)-s.lines), tspins:Math.max(0,(Number(missionProgress.tSpins)||0)-s.tspins), wins:Math.max(0,(Number(missionProgress.wins)||0)-s.wins)};
+  }
+  function sync() {
+    var checks = {
+      wins_250:(Number(missionProgress.wins)||0)>=250,
+      lines_5000:(Number(missionProgress.lines)||0)>=5000,
+      tspin_30:(Number(missionProgress.tSpins)||0)>=30,
+      perfect_10:(Number(missionProgress.perfects)||0)>=10,
+      login_30:(Number(loginStreak)||0)>=30,
+      shop_10:(Number(shopPurchaseCount)||0)>=10,
+      gacha_100:(Number(missionProgress.gacha)||0)>=100
+    };
+    if (typeof ACHIEVEMENTS !== 'undefined') ACHIEVEMENTS.forEach(function (a) { if (checks[a.id]) a.done = true; });
+    saveState(getState());
+  }
+  var oldSync = window.syncExtendedAchievements;
+  window.syncExtendedAchievements = function () { var r = oldSync ? oldSync.apply(this, arguments) : false; sync(); return r; };
+  function panelHtml() {
+    var b = bounty(), ready = b.lines >= 20 && b.tspins >= 1 && b.wins >= 1;
+    return '<div id="v310BountyPanel" style="margin:8px 0;padding:10px;border:1px solid rgba(103,232,249,.42);border-radius:12px;background:linear-gradient(135deg,rgba(14,116,144,.16),rgba(91,33,182,.18));box-shadow:0 0 18px rgba(34,211,238,.1)" onclick="event.stopPropagation()">' +
+      '<b style="display:block;color:#a5f3fc;font:900 11px Orbitron,\"Noto Sans JP\",sans-serif;letter-spacing:1px">DAILY CHRONO BOUNTY</b>' +
+      '<small style="display:block;color:#cbd5e1;margin:4px 0 7px">今日の目標：ライン20 ／ Tスピン1 ／ 勝利1</small>' +
+      '<div style="color:#fde68a;font-size:9px">ライン '+Math.min(20,b.lines)+'/20　・　Tスピン '+Math.min(1,b.tspins)+'/1　・　勝利 '+Math.min(1,b.wins)+'/1</div>' +
+      '<button class="menu-btn" style="width:100%;margin-top:8px;border-color:#67e8f9;color:#a5f3fc" '+(ready&&!b.state.claimed?'':'disabled')+' onclick="claimV310Bounty()">'+(b.state.claimed?'本日の報酬は受取済み':ready?'報酬を受け取る　💰1200G + 💎1':'目標を達成すると受け取れます')+'</button></div>';
+  }
+  window.claimV310Bounty = function () {
+    var b = bounty();
+    if (b.state.claimed || b.lines < 20 || b.tspins < 1 || b.wins < 1) return;
+    b.state.claimed = true; saveState(b.state); coins += 1200; timeStones += 1; saveData();
+    try { playSound('item'); showPopup('日替わり報酬！ +1200G / 時空石 +1', '#67e8f9', 2); } catch (e) {}
+    openAchievements();
+  };
+  var oldOpen = window.openAchievements;
+  window.openAchievements = function () {
+    var r = oldOpen.apply(this, arguments), box = document.getElementById('mailboxSummary');
+    if (box) { var old = document.getElementById('v310BountyPanel'); if (old) old.remove(); box.insertAdjacentHTML('afterend', panelHtml()); }
+    return r;
+  };
+  sync();
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.CHRONO_SUPABASE_URL = 'https://peicpfgwcwvxdmopkdes.supabase.co';
+window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_Nn1u7bmU';
+</script>
+<script>
+/* v3.1.0 LAN duel client: host/join a room and mirror the opponent board. */
+(function(){
+  'use strict';
+  if(window.__lanDuel) return;
+  var socket=null, room='', player=-1, opponent=null, stateTimer=null, lastLines=0, supaChannel=null;
+  var colors=['#67e8f9','#f472b6','#fbbf24','#a78bfa','#34d399','#fb7185','#f97316'];
+  function wsDefault(){
+    if(window.LAN_SERVER_URL) return window.LAN_SERVER_URL;
+    if(location.protocol==='http:'||location.protocol==='https:') return (location.protocol==='https:'?'wss://':'ws://')+location.host;
+    return 'ws://'+location.hostname+':3000';
+  }
+  function useSupabase(){return !!(window.supabase&&window.CHRONO_SUPABASE_URL&&window.CHRONO_SUPABASE_PUBLISHABLE_KEY);}
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function ui(){
+    if(document.getElementById('lanOpenBtn')) return;
+    var b=document.createElement('button'); b.id='lanOpenBtn'; b.textContent='⚔ LAN対戦'; b.onclick=function(){panel().style.display='grid';};
+    b.style.cssText='position:fixed;right:12px;bottom:12px;z-index:1000;padding:9px 13px;border:1px solid #67e8f9;border-radius:10px;background:linear-gradient(135deg,rgba(8,47,73,.96),rgba(49,24,75,.96));color:#a5f3fc;font:900 11px "Noto Sans JP",sans-serif;box-shadow:0 0 18px rgba(34,211,238,.22);cursor:pointer'; document.body.appendChild(b);
+  }
+  function panel(){
+    var d=document.getElementById('lanOverlay'); if(d) return d;
+    d=document.createElement('div'); d.id='lanOverlay'; d.style.cssText='position:fixed;inset:0;z-index:2000;display:none;place-items:center;padding:16px;background:rgba(2,6,23,.86);backdrop-filter:blur(8px)';
+    d.innerHTML='<div style="width:min(430px,94vw);padding:18px;border:1px solid rgba(103,232,249,.55);border-radius:18px;background:linear-gradient(145deg,#0b1630,#21143a);box-shadow:0 0 45px rgba(34,211,238,.22);color:#e0f2fe;font-family:\"Noto Sans JP\",sans-serif"><div style="color:#67e8f9;font:900 10px Orbitron,sans-serif;letter-spacing:2px">LOCAL NETWORK DUEL</div><h2 style="margin:5px 0;color:#fff">LANオンライン対戦</h2><p style="font-size:10px;color:#cbd5e1;line-height:1.8">同じWi-Fiにつながっている2台で対戦します。まず「番号を作る」側を決め、表示された番号を相手に伝えてください。もう一方はその番号を入力します。</p><div style="padding:10px;border:1px solid rgba(52,211,153,.35);border-radius:10px;background:rgba(6,78,59,.18);margin-top:10px"><div style="font-weight:900;color:#86efac;font-size:11px">① 受け取る側（番号を作る）</div><div style="font-size:9px;color:#cbd5e1;margin-top:4px">この端末で対戦相手を待ちます。番号は自動で発行されます。</div><button id="lanCreate" class="menu-btn" style="width:100%;margin-top:8px;border-color:#34d399;color:#86efac">番号を作って待つ</button></div><div style="padding:10px;border:1px solid rgba(103,232,249,.35);border-radius:10px;background:rgba(8,47,73,.18);margin-top:9px"><div style="font-weight:900;color:#a5f3fc;font-size:11px">② 参加する側（番号を入力）</div><input id="lanRoom" maxlength="8" placeholder="相手の4文字番号を入力" style="width:100%;margin-top:7px;padding:10px;border:1px solid #475569;border-radius:8px;background:#020617;color:#e2e8f0;text-transform:uppercase;box-sizing:border-box"><button id="lanJoin" class="menu-btn" style="width:100%;margin-top:8px;border-color:#67e8f9;color:#a5f3fc">番号を入力して参加</button></div><div id="lanStatus" style="margin:10px 0;color:#fbbf24;font-size:10px">未接続</div><div style="font-size:9px;color:#94a3b8;line-height:1.6">※2台とも、ホスト側が表示した同じゲームURLを開いてください。</div><button id="lanClose" class="menu-btn" style="width:100%;margin-top:10px">閉じる</button></div>';
+    document.body.appendChild(d); d.querySelector('#lanClose').onclick=function(){d.style.display='none';}; d.querySelector('#lanCreate').onclick=function(){connect('create');}; d.querySelector('#lanJoin').onclick=function(){connect('join');}; return d;
+  }
+  function setStatus(t,col){var e=document.querySelector('#lanStatus');if(e){e.textContent=t;e.style.color=col||'#fbbf24';}}
+  function connect(mode){
+    var d=panel(), url=wsDefault();
+    if(useSupabase()) return connectSupabase(mode,d);
+    try{if(socket)socket.close();socket=new WebSocket(url);}catch(e){setStatus('URLが正しくありません','#fb7185');return;}
+    setStatus('接続中…','#fbbf24');
+    socket.onopen=function(){setStatus(mode==='create'?'部屋を作成中…':'参加中…','#67e8f9');socket.send(JSON.stringify({type:mode,room:d.querySelector('#lanRoom').value.trim()}));};
+    socket.onerror=function(){setStatus('接続失敗。ホストPCのIPとポートを確認してください','#fb7185');};
+    socket.onclose=function(){setStatus('切断されました','#fb7185');stopSync();hideOpponent();};
+    socket.onmessage=function(e){var m;try{m=JSON.parse(e.data);}catch(_){return;}handle(m);};
+  }
+  async function connectSupabase(mode,d){
+    try{
+      if(supaChannel){try{await supaChannel.unsubscribe();}catch(_){}supaChannel=null;}
+      if(mode==='create'){room=makeRoom();player=0;}else{room=(d.querySelector('#lanRoom').value||'').trim().toUpperCase();player=1;}
+      if(!room){setStatus('相手から受け取った4文字番号を入力してください','#fb7185');return;}
+      var client=window.__chronoSupabaseClient||(window.__chronoSupabaseClient=window.supabase.createClient(window.CHRONO_SUPABASE_URL,window.CHRONO_SUPABASE_PUBLISHABLE_KEY));
+      supaChannel=client.channel('chrono-tetris-room-'+room,{config:{broadcast:{self:false,ack:true}}});
+      supaChannel.on('broadcast',{event:'hello'},function(){setStatus('対戦相手が接続しました。対戦準備完了','#86efac');showOpponent();startSync();});
+      supaChannel.on('broadcast',{event:'state'},function(e){handle(Object.assign({type:'opponent-state'},e.payload||{}));});
+      supaChannel.on('broadcast',{event:'attack'},function(e){handle(Object.assign({type:'attack'},e.payload||{}));});
+      supaChannel.on('broadcast',{event:'result'},function(e){handle(Object.assign({type:'result'},e.payload||{}));});
+      setStatus(mode==='create'?'番号 '+room+' を相手に伝えて待っています…':'番号 '+room+' で参加中…','#67e8f9');showOpponent();
+      await new Promise(function(resolve,reject){supaChannel.subscribe(function(status){if(status==='SUBSCRIBED')resolve();if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')reject(new Error(status));});});
+      await supaChannel.send({type:'broadcast',event:'hello',payload:{player:player}});
+    }catch(e){setStatus('Supabase接続失敗：URL・公開キー・通信環境を確認してください','#fb7185');}
+  }
+  function makeRoom(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<4;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+  function send(m){if(supaChannel){var ev=m.type==='state'?'state':m.type==='attack'?'attack':m.type==='result'?'result':m.type,p=Object.assign({},m);delete p.type;supaChannel.send({type:'broadcast',event:ev,payload:p});return;}if(socket&&socket.readyState===1)socket.send(JSON.stringify(m));}
+  function handle(m){
+    if(m.type==='room'){room=m.room;player=m.player;document.querySelector('#lanRoom').value=room;setStatus('部屋 '+room+' ／ '+(m.count||1)+'人目。相手を待っています','#86efac');showOpponent();if(m.count===2)startSync();}
+    else if(m.type==='ready'){setStatus('対戦準備完了。両者のプレイ画面を同期します','#86efac');showOpponent();startSync();if(typeof startPracticeMode==='function'&&gameState!=='PLAYING'){try{startPracticeMode();}catch(e){}}}
+    else if(m.type==='opponent-state'){opponent=m;showOpponent();}
+    else if(m.type==='attack'){try{if(typeof raiseGarbageRow==='function'&&gameState==='PLAYING'){for(var i=0;i<Math.min(4,Number(m.lines)||0);i++)raiseGarbageRow();}if(typeof showPopup==='function')showPopup('相手からお邪魔 '+m.lines+'段','#fb7185',1.2);}catch(e){}}
+    else if(m.type==='result'){setStatus(m.result==='win'?'相手が敗北しました':'相手が勝利しました',m.result==='win'?'#86efac':'#fb7185');}
+    else if(m.type==='peer-left'){setStatus('相手が退出しました','#fb7185');}
+    else if(m.type==='error'){setStatus(m.message||'通信エラー','#fb7185');}
+  }
+  function state(){
+    if(!socket||socket.readyState!==1||typeof board==='undefined')return;
+    var b=board.map(function(r){return r.slice();});
+    send({type:'state',board:b,hp:Number(playerHp)||0,maxHp:Number(calcMaxHp)||1,lines:Number(lines)||0,score:Number(score)||0,game:gameState});
+  }
+  function startSync(){if(stateTimer)return;stateTimer=setInterval(state,100);state();}
+  function stopSync(){if(stateTimer){clearInterval(stateTimer);stateTimer=null;}if(supaChannel){try{supaChannel.unsubscribe();}catch(_){}supaChannel=null;}}
+  function hideOpponent(){var e=document.getElementById('lanOpponentHud');if(e)e.remove();}
+  function showOpponent(){
+    var e=document.getElementById('lanOpponentHud');if(!e){e=document.createElement('div');e.id='lanOpponentHud';e.style.cssText='position:fixed;right:10px;top:12px;z-index:1100;width:min(230px,42vw);padding:9px;border:1px solid rgba(244,114,182,.6);border-radius:13px;background:rgba(15,23,42,.94);box-shadow:0 0 24px rgba(244,114,182,.2);color:#fecdd3;font:900 10px "Noto Sans JP",sans-serif';e.innerHTML='<div style="display:flex;justify-content:space-between;color:#f9a8d4"><span>OPPONENT // LAN</span><span id="lanRoomBadge"></span></div><canvas id="lanOpponentCanvas" width="200" height="400" style="width:100%;height:auto;display:block;margin-top:6px;background:#020617;border:1px solid rgba(244,114,182,.35);border-radius:7px"></canvas><div id="lanOpponentInfo" style="margin-top:5px;color:#cbd5e1;font-size:9px">相手を待っています</div>';document.body.appendChild(e);}
+    var badge=document.getElementById('lanRoomBadge');if(badge)badge.textContent=room?'ROOM '+room:'';draw();
+  }
+  function draw(){var c=document.getElementById('lanOpponentCanvas');if(!c||!opponent)return;var x=c.getContext('2d'),b=opponent.board||[],rows=b.length||24,cols=(b[0]&&b[0].length)||10,w=c.width/cols,h=c.height/rows;x.clearRect(0,0,c.width,c.height);x.fillStyle='#020617';x.fillRect(0,0,c.width,c.height);for(var r=0;r<rows;r++)for(var q=0;q<cols;q++){var v=b[r]&&b[r][q];if(v){x.fillStyle=colors[(Number(v)-1)%colors.length];x.fillRect(q*w+1,r*h+1,w-2,h-2);x.fillStyle='rgba(255,255,255,.2)';x.fillRect(q*w+2,r*h+2,w-4,Math.max(2,h*.16));}}var info=document.getElementById('lanOpponentInfo');if(info)info.textContent='HP '+Math.round(opponent.hp||0)+' / '+Math.round(opponent.maxHp||0)+'　ライン '+(opponent.lines||0);}
+  var oldClear=window.clearLines;
+  if(typeof oldClear==='function')window.clearLines=function(){var before=Number(lines)||0,r=oldClear.apply(this,arguments),n=Math.max(0,(Number(lines)||0)-before);if(n>0)send({type:'attack',lines:n});return r;};
+  var oldVictory=window.triggerVictory,oldDefeat=window.triggerDefeat;
+  if(typeof oldVictory==='function')window.triggerVictory=function(){send({type:'result',result:'win'});return oldVictory.apply(this,arguments);};
+  if(typeof oldDefeat==='function')window.triggerDefeat=function(){send({type:'result',result:'lose'});return oldDefeat.apply(this,arguments);};
+  window.__lanDuel={connect:connect,disconnect:function(){if(socket)socket.close();},send:send};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ui);else setTimeout(ui,0);
 })();
 </script>
 </body>
