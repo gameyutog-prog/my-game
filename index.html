@@ -532,6 +532,13 @@
         <div class="menu-btn" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;margin-top:8px;border-color:#34d399;color:#d1fae5;background:linear-gradient(100deg,rgba(16,185,129,.2),rgba(13,148,136,.06));text-align:left" onclick="startPracticeMode()"><span style="font:900 12px Orbitron,sans-serif;letter-spacing:1px;color:#6ee7b7">🎯 テトリス一人プレイ</span><span style="font-size:9px;color:#a7f3d0">敵なし・純粋なテトリス（スコアとレベル）　›</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px"><div class="menu-btn" style="border-color:#fbbf24;color:#fbbf24;font-size:9px" onclick="startDailyMode()">☀️ 日替わり</div><div class="menu-btn" style="border-color:#f87171;color:#f87171;font-size:9px" onclick="startBossRush()">👹 ボスラッシュ</div><div class="menu-btn" style="border-color:#a78bfa;color:#c4b5fd;font-size:9px" onclick="startTimeAttack()">⏱ 時間制限</div><div class="menu-btn" style="border-color:#38bdf8;color:#38bdf8;font-size:9px" onclick="startSurvivalMode()">♾️ 生存挑戦</div><div class="menu-btn" style="border-color:#67e8f9;color:#67e8f9;font-size:9px" onclick="startMiningMode()">💎 時空石採掘</div></div>
       </div>
 
+      <div style="margin-top:10px;padding:12px;border:1px solid rgba(103,232,249,.45);border-radius:14px;background:linear-gradient(100deg,rgba(8,47,73,.38),rgba(49,24,75,.28));">
+        <div class="section-title" style="margin-bottom:8px">▼ MULTIPLAYER (対戦接続) // v4.0.0</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+          <div class="menu-btn" style="border:2px solid #a78bfa;color:#e9d5ff;font-size:14px;padding:18px 8px;background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(30,41,59,.45));" onclick="openOnlineDuel()">🌐 オンライン対戦<small style="display:block;font-size:9px;margin-top:5px;color:#c4b5fd">Supabase Realtime</small></div>
+          <div class="menu-btn" style="border:2px solid #67e8f9;color:#a5f3fc;font-size:14px;padding:18px 8px;background:linear-gradient(135deg,rgba(8,145,178,.28),rgba(30,41,59,.45));" onclick="openLanDuel()">📡 LAN対戦<small style="display:block;font-size:9px;margin-top:5px;color:#7dd3fc">同じWi-Fi・LANサーバー</small></div>
+        </div>
+      </div>
       <!-- BASE CAMP -->
       <div>
         <div class="section-title">▼ BASE CAMP (編成・強化)</div>
@@ -6358,7 +6365,8 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
 (function(){
   'use strict';
   if(window.__lanDuel) return;
-  var socket=null, room='', player=-1, opponent=null, stateTimer=null, lastLines=0, supaChannel=null;
+  var socket=null, room='', player=-1, opponent=null, stateTimer=null, lastLines=0, supaChannel=null, selectedTransport='online';
+  var GAME_VERSION='v4.0.0';
   var colors=['#67e8f9','#f472b6','#fbbf24','#a78bfa','#34d399','#fb7185','#f97316'];
   function wsDefault(){
     if(window.LAN_SERVER_URL) return window.LAN_SERVER_URL;
@@ -6369,19 +6377,21 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
   function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function ui(){
     if(document.getElementById('lanOpenBtn')) return;
-    var b=document.createElement('button'); b.id='lanOpenBtn'; b.textContent='⚔ LAN対戦'; b.onclick=function(){panel().style.display='grid';};
-    b.style.cssText='position:fixed;right:12px;bottom:12px;z-index:1000;padding:9px 13px;border:1px solid #67e8f9;border-radius:10px;background:linear-gradient(135deg,rgba(8,47,73,.96),rgba(49,24,75,.96));color:#a5f3fc;font:900 11px "Noto Sans JP",sans-serif;box-shadow:0 0 18px rgba(34,211,238,.22);cursor:pointer'; document.body.appendChild(b);
+    return;
   }
   function panel(){
     var d=document.getElementById('lanOverlay'); if(d) return d;
     d=document.createElement('div'); d.id='lanOverlay'; d.style.cssText='position:fixed;inset:0;z-index:2000;display:none;place-items:center;padding:16px;background:rgba(2,6,23,.86);backdrop-filter:blur(8px)';
     d.innerHTML='<div style="width:min(430px,94vw);padding:18px;border:1px solid rgba(103,232,249,.55);border-radius:18px;background:linear-gradient(145deg,#0b1630,#21143a);box-shadow:0 0 45px rgba(34,211,238,.22);color:#e0f2fe;font-family:\"Noto Sans JP\",sans-serif"><div style="color:#67e8f9;font:900 10px Orbitron,sans-serif;letter-spacing:2px">LOCAL NETWORK DUEL</div><h2 style="margin:5px 0;color:#fff">LANオンライン対戦</h2><p style="font-size:10px;color:#cbd5e1;line-height:1.8">同じWi-Fiにつながっている2台で対戦します。まず「番号を作る」側を決め、表示された番号を相手に伝えてください。もう一方はその番号を入力します。</p><div style="padding:10px;border:1px solid rgba(52,211,153,.35);border-radius:10px;background:rgba(6,78,59,.18);margin-top:10px"><div style="font-weight:900;color:#86efac;font-size:11px">① 受け取る側（番号を作る）</div><div style="font-size:9px;color:#cbd5e1;margin-top:4px">この端末で対戦相手を待ちます。番号は自動で発行されます。</div><button id="lanCreate" class="menu-btn" style="width:100%;margin-top:8px;border-color:#34d399;color:#86efac">番号を作って待つ</button></div><div style="padding:10px;border:1px solid rgba(103,232,249,.35);border-radius:10px;background:rgba(8,47,73,.18);margin-top:9px"><div style="font-weight:900;color:#a5f3fc;font-size:11px">② 参加する側（番号を入力）</div><input id="lanRoom" maxlength="8" placeholder="相手の4文字番号を入力" style="width:100%;margin-top:7px;padding:10px;border:1px solid #475569;border-radius:8px;background:#020617;color:#e2e8f0;text-transform:uppercase;box-sizing:border-box"><button id="lanJoin" class="menu-btn" style="width:100%;margin-top:8px;border-color:#67e8f9;color:#a5f3fc">番号を入力して参加</button></div><div id="lanStatus" style="margin:10px 0;color:#fbbf24;font-size:10px">未接続</div><div style="font-size:9px;color:#94a3b8;line-height:1.6">※2台とも、ホスト側が表示した同じゲームURLを開いてください。</div><button id="lanClose" class="menu-btn" style="width:100%;margin-top:10px">閉じる</button></div>';
-    document.body.appendChild(d); d.querySelector('#lanClose').onclick=function(){d.style.display='none';}; d.querySelector('#lanCreate').onclick=function(){connect('create');}; d.querySelector('#lanJoin').onclick=function(){connect('join');}; return d;
+    document.body.appendChild(d); var badge=document.createElement('div');badge.id='lanModeBadge';badge.style.cssText='margin:8px 0;padding:7px;border:1px solid rgba(103,232,249,.35);border-radius:8px;color:#a5f3fc;font-weight:900;font-size:10px';d.querySelector('h2').after(badge);var ver=document.createElement('div');ver.id='lanVersionCheck';ver.style.cssText='margin-top:5px;color:#94a3b8;font-size:9px';ver.textContent='自分のバージョン：'+GAME_VERSION+' ／ 相手：未接続';d.querySelector('#lanStatus').after(ver);d.querySelector('#lanClose').onclick=function(){d.style.display='none';}; d.querySelector('#lanCreate').onclick=function(){connect('create');}; d.querySelector('#lanJoin').onclick=function(){connect('join');}; return d;
   }
   function setStatus(t,col){var e=document.querySelector('#lanStatus');if(e){e.textContent=t;e.style.color=col||'#fbbf24';}}
+  function setTransport(kind){selectedTransport=kind;var d=panel();d.style.display='grid';var b=d.querySelector('#lanModeBadge');if(b)b.textContent=kind==='online'?'接続方式：オンライン対戦（Supabase Realtime）':'接続方式：LANサーバー（同じWi-Fi）';}
+  function openOnlineDuel(){setTransport('online');}
+  function openLanDuel(){setTransport('lan');}
   function connect(mode){
     var d=panel(), url=wsDefault();
-    if(useSupabase()) return connectSupabase(mode,d);
+    if(selectedTransport==='online'&&useSupabase()) return connectSupabase(mode,d);
     try{if(socket)socket.close();socket=new WebSocket(url);}catch(e){setStatus('URLが正しくありません','#fb7185');return;}
     setStatus('接続中…','#fbbf24');
     socket.onopen=function(){setStatus(mode==='create'?'部屋を作成中…':'参加中…','#67e8f9');socket.send(JSON.stringify({type:mode,room:d.querySelector('#lanRoom').value.trim()}));};
@@ -6396,18 +6406,19 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
       if(!room){setStatus('相手から受け取った4文字番号を入力してください','#fb7185');return;}
       var client=window.__chronoSupabaseClient||(window.__chronoSupabaseClient=window.supabase.createClient(window.CHRONO_SUPABASE_URL,window.CHRONO_SUPABASE_PUBLISHABLE_KEY));
       supaChannel=client.channel('chrono-tetris-room-'+room,{config:{broadcast:{self:false,ack:true}}});
-      supaChannel.on('broadcast',{event:'hello'},function(){setStatus('対戦相手が接続しました。対戦準備完了','#86efac');showOpponent();startSync();});
+      supaChannel.on('broadcast',{event:'hello'},function(e){var v=e&&e.payload&&e.payload.version;if(v&&v!==GAME_VERSION){handle({version:v,type:'version-error'});return;}if(v)handle({version:v,type:'version-ok'});setStatus('対戦相手が接続しました。対戦準備完了','#86efac');showOpponent();startSync();});
       supaChannel.on('broadcast',{event:'state'},function(e){handle(Object.assign({type:'opponent-state'},e.payload||{}));});
       supaChannel.on('broadcast',{event:'attack'},function(e){handle(Object.assign({type:'attack'},e.payload||{}));});
       supaChannel.on('broadcast',{event:'result'},function(e){handle(Object.assign({type:'result'},e.payload||{}));});
       setStatus(mode==='create'?'番号 '+room+' を相手に伝えて待っています…':'番号 '+room+' で参加中…','#67e8f9');showOpponent();
       await new Promise(function(resolve,reject){supaChannel.subscribe(function(status){if(status==='SUBSCRIBED')resolve();if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')reject(new Error(status));});});
-      await supaChannel.send({type:'broadcast',event:'hello',payload:{player:player}});
+      await supaChannel.send({type:'broadcast',event:'hello',payload:{player:player,version:GAME_VERSION}});
     }catch(e){setStatus('Supabase接続失敗：URL・公開キー・通信環境を確認してください','#fb7185');}
   }
   function makeRoom(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<4;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
   function send(m){if(supaChannel){var ev=m.type==='state'?'state':m.type==='attack'?'attack':m.type==='result'?'result':m.type,p=Object.assign({},m);delete p.type;supaChannel.send({type:'broadcast',event:ev,payload:p});return;}if(socket&&socket.readyState===1)socket.send(JSON.stringify(m));}
   function handle(m){
+    if(m.version){var v=document.querySelector('#lanVersionCheck');if(v)v.textContent='自分のバージョン：'+GAME_VERSION+' ／ 相手：'+m.version;if(m.version!==GAME_VERSION){setStatus('エラー：相手とバージョンが違います（自分 '+GAME_VERSION+' / 相手 '+m.version+'）','#fb7185');return;}}
     if(m.type==='room'){room=m.room;player=m.player;document.querySelector('#lanRoom').value=room;setStatus('部屋 '+room+' ／ '+(m.count||1)+'人目。相手を待っています','#86efac');showOpponent();if(m.count===2)startSync();}
     else if(m.type==='ready'){setStatus('対戦準備完了。両者のプレイ画面を同期します','#86efac');showOpponent();startSync();if(typeof startPracticeMode==='function'&&gameState!=='PLAYING'){try{startPracticeMode();}catch(e){}}}
     else if(m.type==='opponent-state'){opponent=m;showOpponent();}
@@ -6419,7 +6430,7 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
   function state(){
     if(!socket||socket.readyState!==1||typeof board==='undefined')return;
     var b=board.map(function(r){return r.slice();});
-    send({type:'state',board:b,hp:Number(playerHp)||0,maxHp:Number(calcMaxHp)||1,lines:Number(lines)||0,score:Number(score)||0,game:gameState});
+      send({type:'state',version:GAME_VERSION,board:b,hp:Number(playerHp)||0,maxHp:Number(calcMaxHp)||1,lines:Number(lines)||0,score:Number(score)||0,game:gameState});
   }
   function startSync(){if(stateTimer)return;stateTimer=setInterval(state,100);state();}
   function stopSync(){if(stateTimer){clearInterval(stateTimer);stateTimer=null;}if(supaChannel){try{supaChannel.unsubscribe();}catch(_){}supaChannel=null;}}
@@ -6434,6 +6445,7 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
   var oldVictory=window.triggerVictory,oldDefeat=window.triggerDefeat;
   if(typeof oldVictory==='function')window.triggerVictory=function(){send({type:'result',result:'win'});return oldVictory.apply(this,arguments);};
   if(typeof oldDefeat==='function')window.triggerDefeat=function(){send({type:'result',result:'lose'});return oldDefeat.apply(this,arguments);};
+  window.openOnlineDuel=openOnlineDuel;window.openLanDuel=openLanDuel;
   window.__lanDuel={connect:connect,disconnect:function(){if(socket)socket.close();},send:send};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ui);else setTimeout(ui,0);
 })();
