@@ -533,7 +533,7 @@
       </div>
 
       <div style="margin-top:10px;padding:12px;border:1px solid rgba(103,232,249,.45);border-radius:14px;background:linear-gradient(100deg,rgba(8,47,73,.38),rgba(49,24,75,.28));">
-        <div class="section-title" style="margin-bottom:8px">▼ MULTIPLAYER (対戦接続) // v4.0.0</div>
+        <div class="section-title" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span>▼ MULTIPLAYER (対戦接続) // v4.0.0</span><span id="connectionStatusBadge" style="font-size:9px;padding:4px 7px;border:1px solid #64748b;border-radius:8px;color:#cbd5e1;white-space:nowrap">● ONLINE ／ 未接続</span></div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
           <div class="menu-btn" style="border:2px solid #a78bfa;color:#e9d5ff;font-size:14px;padding:18px 8px;background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(30,41,59,.45));" onclick="openOnlineDuel()">🌐 オンライン対戦<small style="display:block;font-size:9px;margin-top:5px;color:#c4b5fd">Supabase Realtime</small></div>
           <div class="menu-btn" style="border:2px solid #67e8f9;color:#a5f3fc;font-size:14px;padding:18px 8px;background:linear-gradient(135deg,rgba(8,145,178,.28),rgba(30,41,59,.45));" onclick="openLanDuel()">📡 LAN対戦<small style="display:block;font-size:9px;margin-top:5px;color:#7dd3fc">同じWi-Fi・LANサーバー</small></div>
@@ -4466,7 +4466,7 @@ body.home-new #startOverlay .home-content-shell,body.home-new #homeSettingsBtn{d
     cards.forEach(function(c){if(!c.parentNode)so.insertBefore(c,so.querySelector('.danger-zone')||so.lastElementChild);});
     var dz=so.querySelector('.danger-zone');if(dz){var safe=cards[3];safe.appendChild(dz);}
   }
-  var notices=[['🧪 v4.0.0','設定画面の表示とホーム画面の入場演出を改善しました。'],['💾 セーブ引き継ぎ','レベル、操作設定、ホームデザインなどをバックアップから引き継げます。'],['📢 お知らせ','今後も遊びやすさ、演出、保存機能を中心に改善していきます。']];
+  var notices=[['🌐 v4.0.0 オンライン対戦','Supabase Realtimeに対応しました。オンライン対戦とLAN対戦をメニューから選べます。'],['⚔ 対戦方式の確認','オンラインはSupabase、LANは同じWi-Fi内のLANサーバーを使用します。相手とバージョンが違う場合はエラー表示します。'],['💾 セーブ引き継ぎ','レベル、操作設定、ホームデザインなどをバックアップから引き継げます。']];
   window.openNotices=function(){var o=document.getElementById('noticeOverlay');if(!o){o=document.createElement('div');o.id='noticeOverlay';o.className='overlay';o.style.zIndex=65;document.getElementById('gameContainer').appendChild(o);}o.innerHTML='<div style="width:min(500px,92vw);padding:18px 14px"><div class="title-text" style="font-size:22px;color:#fde68a">📢 お知らせ</div>'+notices.map(function(n){return '<div class="v306-settings-card"><b style="color:#fde68a">'+n[0]+'</b><p class="v306-settings-desc" style="font-size:11px;color:#e2e8f0">'+n[1]+'</p></div>';}).join('')+'<button class="menu-btn" style="width:190px;margin:10px auto;display:block" onclick="openHome()">ホームへ戻る</button></div>';document.querySelectorAll('.overlay').forEach(function(x){x.classList.add('hidden');});o.classList.remove('hidden');};
   var home=document.getElementById('startOverlay');if(home&&!document.getElementById('homeNotice')){var n=document.createElement('div');n.id='homeNotice';n.innerHTML='<b>📢 お知らせ　v4.0.0</b><small>設定・ホーム演出・セーブ引き継ぎを更新しました。タップして詳細を見る</small>';n.onclick=openNotices;var anchor=home.querySelector('.home-brand-head')||home.firstElementChild;if(anchor)anchor.insertAdjacentElement('afterend',n);}
 })();
@@ -6376,27 +6376,30 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
   function useSupabase(){return !!(window.supabase&&window.CHRONO_SUPABASE_URL&&window.CHRONO_SUPABASE_PUBLISHABLE_KEY);}
   function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function ui(){
-    if(document.getElementById('lanOpenBtn')) return;
     return;
   }
+  function ensureMenuUI(){var n=document.getElementById('homeNova');if(!n)return;var top=n.querySelector('.nv-title');if(top&&!n.querySelector('#connectionStatusBadgeNova')){var b=document.createElement('span');b.id='connectionStatusBadgeNova';b.textContent='● ONLINE ／ 未接続';b.style.cssText='display:inline-block;margin-left:8px;padding:3px 6px;border:1px solid #64748b;border-radius:7px;color:#cbd5e1;font:900 8px sans-serif;vertical-align:middle;white-space:nowrap';top.appendChild(b);}var main=n.querySelector('#nvMain');if(main&&!n.querySelector('#novaOnlineDuel')){var a=document.createElement('div');a.id='novaOnlineDuel';a.className='nv-tile big';a.dataset.fn='openOnlineDuel';a.style.setProperty('--c','#a78bfa');a.innerHTML='<span>🌐</span>オンライン対戦<small>Supabase Realtime</small>';var l=document.createElement('div');l.id='novaLanDuel';l.className='nv-tile big';l.dataset.fn='openLanDuel';l.style.setProperty('--c','#67e8f9');l.innerHTML='<span>📡</span>LAN対戦<small>同じWi-Fi・LANサーバー</small>';main.appendChild(a);main.appendChild(l);}}
   function panel(){
     var d=document.getElementById('lanOverlay'); if(d) return d;
     d=document.createElement('div'); d.id='lanOverlay'; d.style.cssText='position:fixed;inset:0;z-index:2000;display:none;place-items:center;padding:16px;background:rgba(2,6,23,.86);backdrop-filter:blur(8px)';
     d.innerHTML='<div style="width:min(430px,94vw);padding:18px;border:1px solid rgba(103,232,249,.55);border-radius:18px;background:linear-gradient(145deg,#0b1630,#21143a);box-shadow:0 0 45px rgba(34,211,238,.22);color:#e0f2fe;font-family:\"Noto Sans JP\",sans-serif"><div style="color:#67e8f9;font:900 10px Orbitron,sans-serif;letter-spacing:2px">LOCAL NETWORK DUEL</div><h2 style="margin:5px 0;color:#fff">LANオンライン対戦</h2><p style="font-size:10px;color:#cbd5e1;line-height:1.8">同じWi-Fiにつながっている2台で対戦します。まず「番号を作る」側を決め、表示された番号を相手に伝えてください。もう一方はその番号を入力します。</p><div style="padding:10px;border:1px solid rgba(52,211,153,.35);border-radius:10px;background:rgba(6,78,59,.18);margin-top:10px"><div style="font-weight:900;color:#86efac;font-size:11px">① 受け取る側（番号を作る）</div><div style="font-size:9px;color:#cbd5e1;margin-top:4px">この端末で対戦相手を待ちます。番号は自動で発行されます。</div><button id="lanCreate" class="menu-btn" style="width:100%;margin-top:8px;border-color:#34d399;color:#86efac">番号を作って待つ</button></div><div style="padding:10px;border:1px solid rgba(103,232,249,.35);border-radius:10px;background:rgba(8,47,73,.18);margin-top:9px"><div style="font-weight:900;color:#a5f3fc;font-size:11px">② 参加する側（番号を入力）</div><input id="lanRoom" maxlength="8" placeholder="相手の4文字番号を入力" style="width:100%;margin-top:7px;padding:10px;border:1px solid #475569;border-radius:8px;background:#020617;color:#e2e8f0;text-transform:uppercase;box-sizing:border-box"><button id="lanJoin" class="menu-btn" style="width:100%;margin-top:8px;border-color:#67e8f9;color:#a5f3fc">番号を入力して参加</button></div><div id="lanStatus" style="margin:10px 0;color:#fbbf24;font-size:10px">未接続</div><div style="font-size:9px;color:#94a3b8;line-height:1.6">※2台とも、ホスト側が表示した同じゲームURLを開いてください。</div><button id="lanClose" class="menu-btn" style="width:100%;margin-top:10px">閉じる</button></div>';
-    document.body.appendChild(d); var badge=document.createElement('div');badge.id='lanModeBadge';badge.style.cssText='margin:8px 0;padding:7px;border:1px solid rgba(103,232,249,.35);border-radius:8px;color:#a5f3fc;font-weight:900;font-size:10px';d.querySelector('h2').after(badge);var ver=document.createElement('div');ver.id='lanVersionCheck';ver.style.cssText='margin-top:5px;color:#94a3b8;font-size:9px';ver.textContent='自分のバージョン：'+GAME_VERSION+' ／ 相手：未接続';d.querySelector('#lanStatus').after(ver);d.querySelector('#lanClose').onclick=function(){d.style.display='none';}; d.querySelector('#lanCreate').onclick=function(){connect('create');}; d.querySelector('#lanJoin').onclick=function(){connect('join');}; return d;
+    document.body.appendChild(d); var badge=document.createElement('div');badge.id='lanModeBadge';badge.style.cssText='margin:8px 0;padding:7px;border:1px solid rgba(103,232,249,.35);border-radius:8px;color:#a5f3fc;font-weight:900;font-size:10px';d.querySelector('h2').after(badge);var ver=document.createElement('div');ver.id='lanVersionCheck';ver.style.cssText='margin-top:5px;color:#94a3b8;font-size:9px';ver.textContent='自分のバージョン：'+GAME_VERSION+' ／ 相手：未接続';d.querySelector('#lanStatus').after(ver);var self=document.createElement('div');self.id='lanSelfInfo';self.style.cssText='margin-top:4px;color:#c4b5fd;font-size:9px';self.textContent='自分の能力：読み込み中';ver.after(self);d.querySelector('#lanClose').onclick=function(){d.style.display='none';}; d.querySelector('#lanCreate').onclick=function(){connect('create');}; d.querySelector('#lanJoin').onclick=function(){connect('join');}; return d;
   }
   function setStatus(t,col){var e=document.querySelector('#lanStatus');if(e){e.textContent=t;e.style.color=col||'#fbbf24';}}
+  function setConnectionStatus(mode,state){ensureMenuUI();var es=document.querySelectorAll('#connectionStatusBadge,#connectionStatusBadgeNova');if(!es.length)return;var online=navigator.onLine!==false, label=!online?'● OFFLINE ／ 通信なし':mode==='lan'?(state==='connected'?'● LAN ／ 接続済み':'● LAN ／ 未接続'):(state==='connected'?'● ONLINE ／ Supabase接続済み':state==='connecting'?'● ONLINE ／ 接続中':'● ONLINE ／ 未接続');es.forEach(function(e){e.textContent=label;e.style.color=state==='connected'?'#86efac':!online?'#fb7185':'#fbbf24';e.style.borderColor=e.style.color;});}
+  setConnectionStatus('online','idle');window.addEventListener('online',function(){setConnectionStatus(selectedTransport,'idle');});window.addEventListener('offline',function(){setConnectionStatus(selectedTransport,'offline');});
   function setTransport(kind){selectedTransport=kind;var d=panel();d.style.display='grid';var b=d.querySelector('#lanModeBadge');if(b)b.textContent=kind==='online'?'接続方式：オンライン対戦（Supabase Realtime）':'接続方式：LANサーバー（同じWi-Fi）';}
   function openOnlineDuel(){setTransport('online');}
   function openLanDuel(){setTransport('lan');}
   function connect(mode){
     var d=panel(), url=wsDefault();
+    setConnectionStatus(selectedTransport,'connecting');
     if(selectedTransport==='online'&&useSupabase()) return connectSupabase(mode,d);
     try{if(socket)socket.close();socket=new WebSocket(url);}catch(e){setStatus('URLが正しくありません','#fb7185');return;}
     setStatus('接続中…','#fbbf24');
-    socket.onopen=function(){setStatus(mode==='create'?'部屋を作成中…':'参加中…','#67e8f9');socket.send(JSON.stringify({type:mode,room:d.querySelector('#lanRoom').value.trim()}));};
-    socket.onerror=function(){setStatus('接続失敗。ホストPCのIPとポートを確認してください','#fb7185');};
-    socket.onclose=function(){setStatus('切断されました','#fb7185');stopSync();hideOpponent();};
+    socket.onopen=function(){setConnectionStatus('lan','connected');setStatus(mode==='create'?'部屋を作成中…':'参加中…','#67e8f9');socket.send(JSON.stringify({type:mode,room:d.querySelector('#lanRoom').value.trim()}));};
+    socket.onerror=function(){setConnectionStatus('lan','error');setStatus('接続失敗。ホストPCのIPとポートを確認してください','#fb7185');};
+    socket.onclose=function(){setConnectionStatus('lan','idle');setStatus('切断されました','#fb7185');stopSync();hideOpponent();};
     socket.onmessage=function(e){var m;try{m=JSON.parse(e.data);}catch(_){return;}handle(m);};
   }
   async function connectSupabase(mode,d){
@@ -6410,10 +6413,10 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
       supaChannel.on('broadcast',{event:'state'},function(e){handle(Object.assign({type:'opponent-state'},e.payload||{}));});
       supaChannel.on('broadcast',{event:'attack'},function(e){handle(Object.assign({type:'attack'},e.payload||{}));});
       supaChannel.on('broadcast',{event:'result'},function(e){handle(Object.assign({type:'result'},e.payload||{}));});
-      setStatus(mode==='create'?'番号 '+room+' を相手に伝えて待っています…':'番号 '+room+' で参加中…','#67e8f9');showOpponent();
-      await new Promise(function(resolve,reject){supaChannel.subscribe(function(status){if(status==='SUBSCRIBED')resolve();if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')reject(new Error(status));});});
+      setConnectionStatus('online','connecting');setStatus(mode==='create'?'番号 '+room+' を相手に伝えて待っています…':'番号 '+room+' で参加中…','#67e8f9');showOpponent();
+      await new Promise(function(resolve,reject){supaChannel.subscribe(function(status){if(status==='SUBSCRIBED'){setConnectionStatus('online','connected');resolve();}if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){setConnectionStatus('online','error');reject(new Error(status));}});});
       await supaChannel.send({type:'broadcast',event:'hello',payload:{player:player,version:GAME_VERSION}});
-    }catch(e){setStatus('Supabase接続失敗：URL・公開キー・通信環境を確認してください','#fb7185');}
+    }catch(e){setConnectionStatus('online','error');setStatus('Supabase接続失敗：URL・公開キー・通信環境を確認してください','#fb7185');}
   }
   function makeRoom(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<4;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
   function send(m){if(supaChannel){var ev=m.type==='state'?'state':m.type==='attack'?'attack':m.type==='result'?'result':m.type,p=Object.assign({},m);delete p.type;supaChannel.send({type:'broadcast',event:ev,payload:p});return;}if(socket&&socket.readyState===1)socket.send(JSON.stringify(m));}
@@ -6423,14 +6426,18 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
     else if(m.type==='ready'){setStatus('対戦準備完了。両者のプレイ画面を同期します','#86efac');showOpponent();startSync();if(typeof startPracticeMode==='function'&&gameState!=='PLAYING'){try{startPracticeMode();}catch(e){}}}
     else if(m.type==='opponent-state'){opponent=m;showOpponent();}
     else if(m.type==='attack'){try{if(typeof raiseGarbageRow==='function'&&gameState==='PLAYING'){for(var i=0;i<Math.min(4,Number(m.lines)||0);i++)raiseGarbageRow();}if(typeof showPopup==='function')showPopup('相手からお邪魔 '+m.lines+'段','#fb7185',1.2);}catch(e){}}
+    else if(m.type==='action'&&m.action==='skill'){try{if(typeof showPopup==='function')showPopup('相手が技を発動：'+(m.skill||'技'),'#c4b5fd',1.4);}catch(e){}}
     else if(m.type==='result'){setStatus(m.result==='win'?'相手が敗北しました':'相手が勝利しました',m.result==='win'?'#86efac':'#fb7185');}
     else if(m.type==='peer-left'){setStatus('相手が退出しました','#fb7185');}
     else if(m.type==='error'){setStatus(m.message||'通信エラー','#fb7185');}
   }
   function state(){
-    if(!socket||socket.readyState!==1||typeof board==='undefined')return;
+    if((!socket||socket.readyState!==1)&&!supaChannel||typeof board==='undefined')return;
     var b=board.map(function(r){return r.slice();});
-      send({type:'state',version:GAME_VERSION,board:b,hp:Number(playerHp)||0,maxHp:Number(calcMaxHp)||1,lines:Number(lines)||0,score:Number(score)||0,game:gameState});
+    var c=(typeof CHARACTERS!=='undefined'&&typeof selectedCharIdx!=='undefined')?CHARACTERS[selectedCharIdx]:null,skills=[];
+    try{if(typeof equippedSkillIds!=='undefined'&&typeof getSkillById==='function')skills=equippedSkillIds.map(function(id){var x=getSkillById(id);return {name:x.name,mp:Number(x.mp)||0,ready:Number(mp)||0>=(Number(x.mp)||0)};});}catch(_){ }
+    var selfInfo=document.getElementById('lanSelfInfo');if(selfInfo)selfInfo.textContent='自分：'+(c?c.name:'-')+' ／ 攻撃力 '+(Number(calcAtk)||0)+' ／ HP '+(Number(playerHp)||0)+' / '+(Number(calcMaxHp)||0)+' ／ 技 '+(skills.map(function(z){return z.name+(z.ready?' ✓':'')}).join(' / ')||'-');
+    send({type:'state',version:GAME_VERSION,board:b,hp:Number(playerHp)||0,maxHp:Number(calcMaxHp)||1,lines:Number(lines)||0,score:Number(score)||0,game:gameState,character:c?c.name:'-',attack:Number(calcAtk)||0,mp:Number(mp)||0,gauge:typeof specialGauge!=='undefined'?Number(specialGauge)||0:0,mode:typeof actionToggle!=='undefined'?actionToggle:'ATTACK',skills:skills});
   }
   function startSync(){if(stateTimer)return;stateTimer=setInterval(state,100);state();}
   function stopSync(){if(stateTimer){clearInterval(stateTimer);stateTimer=null;}if(supaChannel){try{supaChannel.unsubscribe();}catch(_){}supaChannel=null;}}
@@ -6439,15 +6446,16 @@ window.CHRONO_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_03i7TpuTIhPM92QFFVbzHA_
     var e=document.getElementById('lanOpponentHud');if(!e){e=document.createElement('div');e.id='lanOpponentHud';e.style.cssText='position:fixed;right:10px;top:12px;z-index:1100;width:min(230px,42vw);padding:9px;border:1px solid rgba(244,114,182,.6);border-radius:13px;background:rgba(15,23,42,.94);box-shadow:0 0 24px rgba(244,114,182,.2);color:#fecdd3;font:900 10px "Noto Sans JP",sans-serif';e.innerHTML='<div style="display:flex;justify-content:space-between;color:#f9a8d4"><span>OPPONENT // LAN</span><span id="lanRoomBadge"></span></div><canvas id="lanOpponentCanvas" width="200" height="400" style="width:100%;height:auto;display:block;margin-top:6px;background:#020617;border:1px solid rgba(244,114,182,.35);border-radius:7px"></canvas><div id="lanOpponentInfo" style="margin-top:5px;color:#cbd5e1;font-size:9px">相手を待っています</div>';document.body.appendChild(e);}
     var badge=document.getElementById('lanRoomBadge');if(badge)badge.textContent=room?'ROOM '+room:'';draw();
   }
-  function draw(){var c=document.getElementById('lanOpponentCanvas');if(!c||!opponent)return;var x=c.getContext('2d'),b=opponent.board||[],rows=b.length||24,cols=(b[0]&&b[0].length)||10,w=c.width/cols,h=c.height/rows;x.clearRect(0,0,c.width,c.height);x.fillStyle='#020617';x.fillRect(0,0,c.width,c.height);for(var r=0;r<rows;r++)for(var q=0;q<cols;q++){var v=b[r]&&b[r][q];if(v){x.fillStyle=colors[(Number(v)-1)%colors.length];x.fillRect(q*w+1,r*h+1,w-2,h-2);x.fillStyle='rgba(255,255,255,.2)';x.fillRect(q*w+2,r*h+2,w-4,Math.max(2,h*.16));}}var info=document.getElementById('lanOpponentInfo');if(info)info.textContent='HP '+Math.round(opponent.hp||0)+' / '+Math.round(opponent.maxHp||0)+'　ライン '+(opponent.lines||0);}
+  function draw(){var c=document.getElementById('lanOpponentCanvas');if(!c||!opponent)return;var x=c.getContext('2d'),b=opponent.board||[],rows=b.length||24,cols=(b[0]&&b[0].length)||10,w=c.width/cols,h=c.height/rows;x.clearRect(0,0,c.width,c.height);x.fillStyle='#020617';x.fillRect(0,0,c.width,c.height);for(var r=0;r<rows;r++)for(var q=0;q<cols;q++){var v=b[r]&&b[r][q];if(v){x.fillStyle=colors[(Number(v)-1)%colors.length];x.fillRect(q*w+1,r*h+1,w-2,h-2);x.fillStyle='rgba(255,255,255,.2)';x.fillRect(q*w+2,r*h+2,w-4,Math.max(2,h*.16));}}var info=document.getElementById('lanOpponentInfo');if(info){var sk=(opponent.skills||[]).map(function(z){return z.name+(z.ready?' ✓':'')}).join(' / ')||'-';info.textContent='キャラ '+(opponent.character||'-')+'　攻撃力 '+Math.round(opponent.attack||0)+'　HP '+Math.round(opponent.hp||0)+' / '+Math.round(opponent.maxHp||0)+'　ライン '+(opponent.lines||0)+'　MP '+Math.round(opponent.mp||0)+'　技ゲージ '+Math.round(opponent.gauge||0)+'　技 '+sk;}}
   var oldClear=window.clearLines;
   if(typeof oldClear==='function')window.clearLines=function(){var before=Number(lines)||0,r=oldClear.apply(this,arguments),n=Math.max(0,(Number(lines)||0)-before);if(n>0)send({type:'attack',lines:n});return r;};
   var oldVictory=window.triggerVictory,oldDefeat=window.triggerDefeat;
   if(typeof oldVictory==='function')window.triggerVictory=function(){send({type:'result',result:'win'});return oldVictory.apply(this,arguments);};
   if(typeof oldDefeat==='function')window.triggerDefeat=function(){send({type:'result',result:'lose'});return oldDefeat.apply(this,arguments);};
+  var oldSkill=window.triggerSkill;if(typeof oldSkill==='function')window.triggerSkill=function(id){var sk=''+id;try{if(typeof getSkillById==='function')sk=getSkillById(id).name;}catch(_){}send({type:'action',action:'skill',skill:sk,version:GAME_VERSION});return oldSkill.apply(this,arguments);};
   window.openOnlineDuel=openOnlineDuel;window.openLanDuel=openLanDuel;
   window.__lanDuel={connect:connect,disconnect:function(){if(socket)socket.close();},send:send};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ui);else setTimeout(ui,0);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){ensureMenuUI();ui();});else setTimeout(function(){ensureMenuUI();ui();},0);
 })();
 </script>
 </body>
